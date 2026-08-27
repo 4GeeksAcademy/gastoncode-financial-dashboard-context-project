@@ -68,7 +68,7 @@ Se ejecuta completamente con `docker compose up --build`.
 ### Lógica de negocio (en `lib/`)
 - `financial-types.ts` — Interfaces TypeScript
 - `financial-utils.ts` — Funciones: `computeKPIs`, `computeMonthlyData`, `formatCurrency`, `formatPercent`
-- `mock-data.ts` — Dataset mock estático de 53 movimientos del año 2024
+- `mock-data.ts` — Dataset mock estático de 57 movimientos del año 2024
 - `utils.ts` — Función utilitaria `cn()` para merging de clases Tailwind
 
 ---
@@ -93,7 +93,7 @@ services:
 
 | Capa | Framework | Cantidad |
 |---|---|---|
-| **Backend** | `pytest` + `httpx` (TestClient) | 14 tests |
+| **Backend** | `pytest` + `httpx` (TestClient) | 15 tests |
 | **Frontend** | `vitest` | 5 tests (3 describes) |
 
 ---
