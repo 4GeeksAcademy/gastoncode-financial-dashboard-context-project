@@ -68,6 +68,36 @@ describe("computeKPIs", () => {
 });
 
 describe("computeMonthlyData", () => {
+  it("keeps the first day of a month in its ISO month", () => {
+    const monthlyData = computeMonthlyData([
+      {
+        create_date: "2024-02-01",
+        amount: 500,
+        operation_type: "income",
+        category: "sales",
+        business_type: "B2B",
+      },
+    ]);
+
+    expect(monthlyData).toEqual([
+      { month: "Feb 2024", income: 500, outcome: 0, profitPercent: 100 },
+    ]);
+  });
+
+  it("returns zero profit margin for a month with no income", () => {
+    const monthlyData = computeMonthlyData([
+      {
+        create_date: "2024-03-15",
+        amount: 350,
+        operation_type: "outcome",
+        category: "operational",
+        business_type: "B2B",
+      },
+    ]);
+
+    expect(monthlyData[0].profitPercent).toBe(0);
+  });
+
   it("returns chronological year-month points with aggregated totals", () => {
     const unsortedCrossYearMovements: FinancialMovement[] = [
       {
@@ -111,6 +141,15 @@ describe("computeMonthlyData", () => {
 });
 
 describe("summary transformations", () => {
+  it("returns zeroed KPIs for an empty summary", () => {
+    expect(computeKPIsFromSummary([])).toEqual({
+      totalIncome: 0,
+      totalOutcome: 0,
+      profit: 0,
+      profitPercent: 0,
+    });
+  });
+
   it("calculates KPIs from monthly totals", () => {
     expect(computeKPIsFromSummary(sampleSummary)).toEqual({
       totalIncome: 1500,
@@ -128,9 +167,14 @@ describe("summary transformations", () => {
   });
 
   it("returns zero profit margin when summary has no income", () => {
-    expect(computeKPIsFromSummary([
+    const summary = [
       { period: "2024-03", income: 0, outcome: 350, net: -350 },
-    ]).profitPercent).toBe(0);
+    ];
+
+    expect(computeKPIsFromSummary(summary).profitPercent).toBe(0);
+    expect(computeMonthlyDataFromSummary(summary)).toEqual([
+      { month: "Mar 2024", income: 0, outcome: 350, profitPercent: 0 },
+    ]);
   });
 });
 
