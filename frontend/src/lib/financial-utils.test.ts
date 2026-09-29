@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import {
   computeKPIs,
+  computeKPIsFromSummary,
   computeMonthlyData,
+  computeMonthlyDataFromSummary,
   formatCurrency,
   formatPercent,
 } from "./financial-utils";
-import type { FinancialMovement } from "./financial-types";
+import type { FinancialMovement, MetricsSummaryItem } from "./financial-types";
 
 const sampleMovements: FinancialMovement[] = [
   {
@@ -30,6 +32,11 @@ const sampleMovements: FinancialMovement[] = [
     category: "sales",
     business_type: "B2C",
   },
+];
+
+const sampleSummary: MetricsSummaryItem[] = [
+  { period: "2024-01", income: 1000, outcome: 250, net: 750 },
+  { period: "2024-02", income: 500, outcome: 0, net: 500 },
 ];
 
 describe("computeKPIs", () => {
@@ -100,6 +107,30 @@ describe("computeMonthlyData", () => {
       outcome: 0,
       profitPercent: 100,
     });
+  });
+});
+
+describe("summary transformations", () => {
+  it("calculates KPIs from monthly totals", () => {
+    expect(computeKPIsFromSummary(sampleSummary)).toEqual({
+      totalIncome: 1500,
+      totalOutcome: 250,
+      profit: 1250,
+      profitPercent: (1250 / 1500) * 100,
+    });
+  });
+
+  it("maps API periods to chronological chart points", () => {
+    expect(computeMonthlyDataFromSummary(sampleSummary)).toEqual([
+      { month: "Jan 2024", income: 1000, outcome: 250, profitPercent: 75 },
+      { month: "Feb 2024", income: 500, outcome: 0, profitPercent: 100 },
+    ]);
+  });
+
+  it("returns zero profit margin when summary has no income", () => {
+    expect(computeKPIsFromSummary([
+      { period: "2024-03", income: 0, outcome: 350, net: -350 },
+    ]).profitPercent).toBe(0);
   });
 });
 

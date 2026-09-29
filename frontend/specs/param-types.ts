@@ -44,7 +44,7 @@ export interface DateRangeFilter {
  * - `threshold`: ratio between `0.01` and `1.0` (default `0.3`). Only periods
  *   whose outcome increase exceeds this ratio are returned.
  * - `group_by`: aggregation granularity (`"day"`, `"week"`, `"month"`).
- * - `start_date` / `end_date`: optional date range (Feature 1 integration).
+*   `start_date` / `end_date`: optional date range (Feature 1 integration).
  * - `business_type`: optional business‑line filter (`"B2B"` / `"B2C"`).
  */
 export interface AlertsParams extends DateRangeFilter {

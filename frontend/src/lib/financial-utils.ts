@@ -1,6 +1,7 @@
 import {
   type FinancialMovement,
   type KPIMetrics,
+  type MetricsSummaryItem,
   type MonthlyDataPoint,
 } from "./financial-types";
 
@@ -64,6 +65,38 @@ export function computeMonthlyData(
         profitPercent,
       };
     });
+}
+
+export function computeKPIsFromSummary(
+  summary: MetricsSummaryItem[],
+): KPIMetrics {
+  const totals = summary.reduce(
+    (accumulator, item) => ({
+      totalIncome: accumulator.totalIncome + item.income,
+      totalOutcome: accumulator.totalOutcome + item.outcome,
+    }),
+    { totalIncome: 0, totalOutcome: 0 },
+  );
+  const profit = totals.totalIncome - totals.totalOutcome;
+  const profitPercent = totals.totalIncome > 0
+    ? (profit / totals.totalIncome) * 100
+    : 0;
+
+  return { ...totals, profit, profitPercent };
+}
+
+export function computeMonthlyDataFromSummary(
+  summary: MetricsSummaryItem[],
+): MonthlyDataPoint[] {
+  return summary.map(({ period, income, outcome }) => {
+    const profit = income - outcome;
+    return {
+      month: formatMonthYearLabel(period),
+      income,
+      outcome,
+      profitPercent: income > 0 ? (profit / income) * 100 : 0,
+    };
+  });
 }
 
 export function formatCurrency(value: number): string {
